@@ -14,6 +14,7 @@
     .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
     .table-sm td, .table-sm th { vertical-align: middle; }
     .suggestion-card { border:1px solid #e9ecef; border-radius:14px; padding:1rem; background:#fff; height:100%; }
+    .page-link { cursor:pointer; }
   </style>
 </head>
 <body>
@@ -63,11 +64,35 @@
               <select id="moduleType" class="form-select"></select>
             </div>
 
-            <div class="col-md-4">
+            <div class="col-md-3">
               <label class="form-label">Rank</label>
               <select id="rank" class="form-select"></select>
             </div>
-            <div class="col-md-8">
+            <div class="col-md-3">
+              <label class="form-label">Size</label>
+              <select id="capacityFilter" class="form-select">
+                <option value="">All sizes</option>
+                <option value="2GB">2GB</option>
+                <option value="4GB">4GB</option>
+                <option value="8GB">8GB</option>
+                <option value="16GB">16GB</option>
+                <option value="32GB">32GB</option>
+                <option value="64GB">64GB</option>
+                <option value="128GB">128GB</option>
+                <option value="256GB">256GB</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Brand Tier</label>
+              <select id="brandTierFilter" class="form-select">
+                <option value="">All tiers</option>
+                <option value="Tier 1">Tier 1</option>
+                <option value="Tier 2">Tier 2</option>
+                <option value="Tier 3">Tier 3</option>
+                <option value="OEM">OEM</option>
+              </select>
+            </div>
+            <div class="col-md-3">
               <label class="form-label">Usage / For</label>
               <input id="usagePreview" class="form-control" type="text" readonly placeholder="Auto from device + form factor + module type">
             </div>
@@ -76,8 +101,8 @@
               <label class="form-label">Search Part Number or Brand</label>
               <input id="searchInput" class="form-control" type="text" placeholder="Example: Samsung, Micron, M391, Hynix">
             </div>
-            <div class="col-md-3">
-              <label class="form-label">Show Results</label>
+            <div class="col-md-2">
+              <label class="form-label">Per Page</label>
               <select id="resultLimit" class="form-select">
                 <option value="6">6</option>
                 <option value="12" selected>12</option>
@@ -85,12 +110,16 @@
                 <option value="50">50</option>
               </select>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-2">
               <label class="form-label">Suggestion Mode</label>
               <select id="suggestionMode" class="form-select">
                 <option value="strict" selected>Strict match</option>
                 <option value="smart">Smart match</option>
               </select>
+            </div>
+            <div class="col-md-2">
+              <label class="form-label">Page</label>
+              <input id="currentPageDisplay" class="form-control" type="text" readonly value="1">
             </div>
           </div>
 
@@ -101,7 +130,7 @@
           </div>
 
           <div class="alert alert-light border mt-4 mb-0">
-            <strong>Tip:</strong> The dropdowns are interconnected. Start with <strong>Device / System Type</strong>, then <strong>Generation</strong>. The page narrows valid <strong>Form Factor</strong>, <strong>Module Type</strong>, <strong>Voltage</strong>, and <strong>Speed</strong> automatically. Suggestions are filtered before rendering, so large datasets stay fast.
+            <strong>Tip:</strong> The dropdowns are interconnected. Start with <strong>Device / System Type</strong>, then <strong>Generation</strong>. The page narrows valid <strong>Form Factor</strong>, <strong>Module Type</strong>, <strong>Voltage</strong>, and <strong>Speed</strong> automatically. Suggestions are filtered first, then paginated, so large datasets stay fast.
           </div>
 
           <hr class="my-4">
@@ -124,62 +153,14 @@
             </div>
 
             <div class="row g-3">
-              <div class="col-md-6 col-xl-4">
-                <div class="border rounded-4 p-3 h-100">
-                  <div class="result-label">Device / System Type</div>
-                  <div id="resultDevice" class="fw-semibold"></div>
-                  <div id="resultDeviceInfo" class="muted-small mt-1"></div>
-                </div>
-              </div>
-              <div class="col-md-6 col-xl-4">
-                <div class="border rounded-4 p-3 h-100">
-                  <div class="result-label">Generation</div>
-                  <div id="resultGeneration" class="fw-semibold"></div>
-                  <div id="resultGenerationInfo" class="muted-small mt-1"></div>
-                </div>
-              </div>
-              <div class="col-md-6 col-xl-4">
-                <div class="border rounded-4 p-3 h-100">
-                  <div class="result-label">Voltage</div>
-                  <div id="resultVoltage" class="fw-semibold"></div>
-                  <div id="resultVoltageInfo" class="muted-small mt-1"></div>
-                </div>
-              </div>
-              <div class="col-md-6 col-xl-4">
-                <div class="border rounded-4 p-3 h-100">
-                  <div class="result-label">Speed</div>
-                  <div id="resultSpeed" class="fw-semibold"></div>
-                  <div id="resultSpeedInfo" class="muted-small mt-1"></div>
-                </div>
-              </div>
-              <div class="col-md-6 col-xl-4">
-                <div class="border rounded-4 p-3 h-100">
-                  <div class="result-label">Form Factor</div>
-                  <div id="resultFormFactor" class="fw-semibold"></div>
-                  <div id="resultFormFactorInfo" class="muted-small mt-1"></div>
-                </div>
-              </div>
-              <div class="col-md-6 col-xl-4">
-                <div class="border rounded-4 p-3 h-100">
-                  <div class="result-label">Module Type</div>
-                  <div id="resultType" class="fw-semibold"></div>
-                  <div id="resultTypeInfo" class="muted-small mt-1"></div>
-                </div>
-              </div>
-              <div class="col-md-6 col-xl-4">
-                <div class="border rounded-4 p-3 h-100">
-                  <div class="result-label">Rank</div>
-                  <div id="resultRank" class="fw-semibold"></div>
-                  <div id="resultRankInfo" class="muted-small mt-1"></div>
-                </div>
-              </div>
-              <div class="col-12 col-xl-8">
-                <div class="border rounded-4 p-3 h-100">
-                  <div class="result-label">For</div>
-                  <div id="resultFor" class="fw-semibold"></div>
-                  <div id="resultForInfo" class="muted-small mt-1"></div>
-                </div>
-              </div>
+              <div class="col-md-6 col-xl-4"><div class="border rounded-4 p-3 h-100"><div class="result-label">Device / System Type</div><div id="resultDevice" class="fw-semibold"></div><div id="resultDeviceInfo" class="muted-small mt-1"></div></div></div>
+              <div class="col-md-6 col-xl-4"><div class="border rounded-4 p-3 h-100"><div class="result-label">Generation</div><div id="resultGeneration" class="fw-semibold"></div><div id="resultGenerationInfo" class="muted-small mt-1"></div></div></div>
+              <div class="col-md-6 col-xl-4"><div class="border rounded-4 p-3 h-100"><div class="result-label">Voltage</div><div id="resultVoltage" class="fw-semibold"></div><div id="resultVoltageInfo" class="muted-small mt-1"></div></div></div>
+              <div class="col-md-6 col-xl-4"><div class="border rounded-4 p-3 h-100"><div class="result-label">Speed</div><div id="resultSpeed" class="fw-semibold"></div><div id="resultSpeedInfo" class="muted-small mt-1"></div></div></div>
+              <div class="col-md-6 col-xl-4"><div class="border rounded-4 p-3 h-100"><div class="result-label">Form Factor</div><div id="resultFormFactor" class="fw-semibold"></div><div id="resultFormFactorInfo" class="muted-small mt-1"></div></div></div>
+              <div class="col-md-6 col-xl-4"><div class="border rounded-4 p-3 h-100"><div class="result-label">Module Type</div><div id="resultType" class="fw-semibold"></div><div id="resultTypeInfo" class="muted-small mt-1"></div></div></div>
+              <div class="col-md-6 col-xl-4"><div class="border rounded-4 p-3 h-100"><div class="result-label">Rank</div><div id="resultRank" class="fw-semibold"></div><div id="resultRankInfo" class="muted-small mt-1"></div></div></div>
+              <div class="col-12 col-xl-8"><div class="border rounded-4 p-3 h-100"><div class="result-label">For</div><div id="resultFor" class="fw-semibold"></div><div id="resultForInfo" class="muted-small mt-1"></div></div></div>
             </div>
 
             <hr class="my-4">
@@ -195,19 +176,16 @@
             </div>
             <div id="suggestionsEmpty" class="alert alert-light border d-none mb-0">No matching real modules found in the external dataset yet.</div>
             <div id="suggestionsWrap" class="row g-3"></div>
+            <nav id="paginationWrap" class="mt-4 d-none" aria-label="Suggestions pagination">
+              <ul class="pagination justify-content-center mb-0" id="pagination"></ul>
+            </nav>
           </div>
 
           <hr class="my-4">
           <h2 class="h5 mb-3">Reference Guide</h2>
           <div class="table-responsive">
             <table class="table table-sm table-bordered align-middle">
-              <thead class="table-light">
-                <tr>
-                  <th>Identifier</th>
-                  <th>Meaning</th>
-                  <th>Typical For</th>
-                </tr>
-              </thead>
+              <thead class="table-light"><tr><th>Identifier</th><th>Meaning</th><th>Typical For</th></tr></thead>
               <tbody id="referenceTable"></tbody>
             </table>
           </div>
@@ -221,6 +199,13 @@
     const DATASET_PATH = 'data/memory-modules.json';
     let moduleDataset = [];
     let searchIndex = [];
+    let lastFilterResult = { matches: [], total: 0, scanned: 0, page: 1, limit: 12 };
+
+    const BRAND_TIERS = {
+      'Samsung': 'Tier 1', 'SK Hynix': 'Tier 1', 'Micron': 'Tier 1',
+      'Kingston': 'Tier 2', 'Crucial': 'Tier 2', 'Transcend': 'Tier 2', 'ADATA': 'Tier 2', 'TeamGroup': 'Tier 2', 'Corsair': 'Tier 2', 'Patriot': 'Tier 2',
+      'HPE': 'OEM', 'Dell': 'OEM', 'HP': 'OEM', 'Lenovo': 'OEM', 'Supermicro': 'OEM'
+    };
 
     const DATA = {
       devices: {
@@ -250,156 +235,44 @@
         FB: { code: 'FB', label: 'FB-DIMM / Fully Buffered', info: 'Very old server memory type used on certain older platforms.', usage: 'Legacy server', allowedFormFactors: ['DIMM'] }
       },
       ranks: {
-        '': 'Not selected',
-        '1Rx8': 'Single rank, x8 organization. Common and usually fine.',
-        '2Rx8': 'Dual rank, x8 organization. Very common and often preferred.',
-        '1Rx16': 'Single rank, x16 organization. Often more consumer-oriented and not ideal for many server use cases.',
-        '2Rx4': 'Dual rank, x4 organization. More common in server memory than desktop memory.',
-        '4Rx4': 'Quad rank, x4 organization. Usually advanced high-density server memory, often RDIMM/LRDIMM.'
+        '': 'Not selected', '1Rx8': 'Single rank, x8 organization. Common and usually fine.', '2Rx8': 'Dual rank, x8 organization. Very common and often preferred.', '1Rx16': 'Single rank, x16 organization. Often more consumer-oriented and not ideal for many server use cases.', '2Rx4': 'Dual rank, x4 organization. More common in server memory than desktop memory.', '4Rx4': 'Quad rank, x4 organization. Usually advanced high-density server memory, often RDIMM/LRDIMM.'
       },
       references: [
         ['PC2', 'DDR2 generation', 'Legacy desktop / laptop / server'], ['PC3', 'DDR3 generation', 'Older desktop / laptop / server'], ['PC3L', 'DDR3 low-voltage generation', 'Older desktop / laptop / server'], ['PC4', 'DDR4 generation', 'Modern desktop / laptop / server'], ['PC5', 'DDR5 generation', 'Latest desktop / laptop / server'], ['DIMM', 'Full-size memory module', 'Desktop / workstation / server'], ['SODIMM', 'Small-outline memory module', 'Laptop / mini PC / small device'], ['U', 'Unbuffered module, often desktop/laptop unless ECC is clearly stated', 'Desktop / laptop'], ['E', 'ECC UDIMM', 'Entry server / workstation'], ['R', 'Registered DIMM', 'Server'], ['LR', 'Load-reduced DIMM', 'Server'], ['FB', 'Fully buffered DIMM', 'Legacy server'], ['1Rx8', 'Single rank, x8 chips', 'Desktop / laptop / server depending on module'], ['2Rx8', 'Dual rank, x8 chips', 'Common on desktop and server modules'], ['1Rx16', 'Single rank, x16 chips', 'More consumer-oriented'], ['2Rx4', 'Dual rank, x4 chips', 'Common on some server modules'], ['4Rx4', 'Quad rank, x4 chips', 'High-density server memory']
       ]
     };
 
+    function getBrandTier(brand) { return BRAND_TIERS[brand] || 'Tier 3'; }
     function optionHtml(value, label) { return `<option value="${value}">${label}</option>`; }
-    function fillSelect($el, placeholder, items, mapper) {
-      $el.empty().append(optionHtml('', placeholder));
-      items.forEach(item => {
-        const mapped = mapper(item);
-        $el.append(optionHtml(mapped.value, mapped.label));
-      });
-    }
-    function resetDependentSelects() {
-      $('#voltage').html(optionHtml('', 'Auto / optional'));
-      $('#speed').html(optionHtml('', 'Select speed'));
-      $('#formFactor').html(optionHtml('', 'Select form factor'));
-      $('#moduleType').html(optionHtml('', 'Select module type'));
-      $('#usagePreview').val('');
-      $('#suggestionStats').text('');
-    }
-    function fillReferenceTable() {
-      const rows = DATA.references.map(row => `<tr><td class="mono">${row[0]}</td><td>${row[1]}</td><td>${row[2]}</td></tr>`).join('');
-      $('#referenceTable').html(rows);
-    }
+    function fillSelect($el, placeholder, items, mapper) { $el.empty().append(optionHtml('', placeholder)); items.forEach(item => { const mapped = mapper(item); $el.append(optionHtml(mapped.value, mapped.label)); }); }
+    function resetDependentSelects() { $('#voltage').html(optionHtml('', 'Auto / optional')); $('#speed').html(optionHtml('', 'Select speed')); $('#formFactor').html(optionHtml('', 'Select form factor')); $('#moduleType').html(optionHtml('', 'Select module type')); $('#usagePreview').val(''); $('#suggestionStats').text(''); $('#currentPageDisplay').val('1'); }
+    function fillReferenceTable() { const rows = DATA.references.map(row => `<tr><td class="mono">${row[0]}</td><td>${row[1]}</td><td>${row[2]}</td></tr>`).join(''); $('#referenceTable').html(rows); }
 
     async function loadExternalDataset() {
       try {
         const response = await fetch(DATASET_PATH, { cache: 'no-store' });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const json = await response.json();
-        moduleDataset = Array.isArray(json) ? json : [];
-        searchIndex = moduleDataset.map((item, idx) => ({
-          idx,
-          search: [item.brand, item.part_number, item.capacity, item.generation, item.speed, item.type, item.form_factor, item.rank, item.device_hint].filter(Boolean).join(' ').toLowerCase()
-        }));
+        moduleDataset = (Array.isArray(json) ? json : []).map(item => ({ ...item, brand_tier: item.brand_tier || getBrandTier(item.brand) }));
+        searchIndex = moduleDataset.map((item, idx) => ({ idx, search: [item.brand, item.brand_tier, item.part_number, item.capacity, item.generation, item.speed, item.type, item.form_factor, item.rank, item.device_hint].filter(Boolean).join(' ').toLowerCase() }));
         $('#datasetStatus').text(`${moduleDataset.length.toLocaleString()} module record(s) loaded.`);
       } catch (error) {
-        moduleDataset = [];
-        searchIndex = [];
-        $('#datasetStatus').text('External dataset not loaded yet. Add data/memory-modules.json to enable suggestions.');
+        moduleDataset = []; searchIndex = []; $('#datasetStatus').text('External dataset not loaded yet. Add data/memory-modules.json to enable suggestions.');
       }
     }
 
-    function init() {
-      fillSelect($('#device'), 'Select device / system type', Object.keys(DATA.devices), key => ({ value: key, label: DATA.devices[key].label }));
-      fillSelect($('#generation'), 'Select generation', Object.keys(DATA.generations), key => ({ value: key, label: DATA.generations[key].label }));
-      fillSelect($('#rank'), 'Optional', Object.keys(DATA.ranks).filter(Boolean), key => ({ value: key, label: key }));
-      fillReferenceTable();
-      resetDependentSelects();
-      loadExternalDataset();
-    }
-
-    function onDeviceChange() {
-      const deviceKey = $('#device').val();
-      $('#result').addClass('d-none');
-      $('#usagePreview').val('');
-      if (!deviceKey) { resetDependentSelects(); return; }
-      const device = DATA.devices[deviceKey];
-      fillSelect($('#formFactor'), 'Select form factor', device.allowedFormFactors, key => ({ value: key, label: `${key} — ${DATA.formFactors[key].usage}` }));
-      if (device.defaultFormFactor) $('#formFactor').val(device.defaultFormFactor);
-      updateModuleTypes();
-      updateUsagePreview();
-    }
-
-    function onGenerationChange() {
-      const generation = $('#generation').val();
-      $('#result').addClass('d-none');
-      $('#voltage').html(optionHtml('', 'Auto / optional'));
-      $('#speed').html(optionHtml('', 'Select speed'));
-      if (!generation) return;
-      const gen = DATA.generations[generation];
-      fillSelect($('#voltage'), 'Auto / optional', gen.voltageOptions, value => ({ value, label: value }));
-      fillSelect($('#speed'), 'Select speed', Object.keys(gen.speedOptions), key => ({ value: key, label: `${key} — ${gen.speedOptions[key]}` }));
-      updateModuleTypes();
-    }
-
-    function updateModuleTypes() {
-      const generation = $('#generation').val();
-      const formFactor = $('#formFactor').val();
-      const deviceKey = $('#device').val();
-      $('#moduleType').html(optionHtml('', 'Select module type'));
-      $('#result').addClass('d-none');
-      if (!generation) { updateUsagePreview(); return; }
-      const genAllowed = DATA.generations[generation].moduleTypes;
-      let filtered = genAllowed.slice();
-      if (deviceKey && DATA.devices[deviceKey]) filtered = filtered.filter(typeCode => DATA.devices[deviceKey].preferredTypes.includes(typeCode));
-      if (formFactor) {
-        filtered = filtered.filter(typeCode => {
-          const type = DATA.moduleTypes[typeCode];
-          return type.allowedFormFactors.includes(formFactor) && DATA.formFactors[formFactor].allowedTypes.includes(typeCode);
-        });
-      }
-      filtered.forEach(typeCode => {
-        const type = DATA.moduleTypes[typeCode];
-        $('#moduleType').append(optionHtml(typeCode, `${typeCode} — ${type.label}`));
-      });
-      updateUsagePreview();
-    }
-
-    function buildLabel(speed, moduleType, rank) {
-      let label = speed || '';
-      if (moduleType) label += moduleType;
-      if (rank) label += ` ${rank}`;
-      return label;
-    }
-    function computeUsage(formFactor, moduleType) {
-      const usageParts = [];
-      if (formFactor && DATA.formFactors[formFactor]) usageParts.push(DATA.formFactors[formFactor].usage);
-      if (moduleType && DATA.moduleTypes[moduleType]) usageParts.push(DATA.moduleTypes[moduleType].usage);
-      return [...new Set(usageParts)].join(' | ');
-    }
-    function updateUsagePreview() {
-      const deviceKey = $('#device').val();
-      const formFactor = $('#formFactor').val();
-      const moduleType = $('#moduleType').val();
-      const parts = [];
-      if (deviceKey && DATA.devices[deviceKey]) parts.push(DATA.devices[deviceKey].label);
-      const usage = computeUsage(formFactor, moduleType);
-      if (usage) parts.push(usage);
-      $('#usagePreview').val(parts.join(' | '));
-    }
-    function computeCompatibilityBadge(moduleType, formFactor) {
-      if (moduleType === 'E') return '<span class="badge text-bg-success">ECC UDIMM / Entry server-workstation style</span>';
-      if (moduleType === 'R') return '<span class="badge text-bg-warning">RDIMM / Server-only class</span>';
-      if (moduleType === 'LR') return '<span class="badge text-bg-warning">LRDIMM / Higher-capacity server class</span>';
-      if (moduleType === 'FB') return '<span class="badge text-bg-secondary">Legacy FB-DIMM</span>';
-      if (formFactor === 'SODIMM') return '<span class="badge text-bg-info">SODIMM / Laptop-small form factor</span>';
-      return '<span class="badge text-bg-primary">General-purpose module class</span>';
-    }
+    function init() { fillSelect($('#device'), 'Select device / system type', Object.keys(DATA.devices), key => ({ value: key, label: DATA.devices[key].label })); fillSelect($('#generation'), 'Select generation', Object.keys(DATA.generations), key => ({ value: key, label: DATA.generations[key].label })); fillSelect($('#rank'), 'Optional', Object.keys(DATA.ranks).filter(Boolean), key => ({ value: key, label: key })); fillReferenceTable(); resetDependentSelects(); loadExternalDataset(); }
+    function onDeviceChange() { const deviceKey = $('#device').val(); $('#result').addClass('d-none'); $('#usagePreview').val(''); if (!deviceKey) { resetDependentSelects(); return; } const device = DATA.devices[deviceKey]; fillSelect($('#formFactor'), 'Select form factor', device.allowedFormFactors, key => ({ value: key, label: `${key} — ${DATA.formFactors[key].usage}` })); if (device.defaultFormFactor) $('#formFactor').val(device.defaultFormFactor); updateModuleTypes(); updateUsagePreview(); }
+    function onGenerationChange() { const generation = $('#generation').val(); $('#result').addClass('d-none'); $('#voltage').html(optionHtml('', 'Auto / optional')); $('#speed').html(optionHtml('', 'Select speed')); if (!generation) return; const gen = DATA.generations[generation]; fillSelect($('#voltage'), 'Auto / optional', gen.voltageOptions, value => ({ value, label: value })); fillSelect($('#speed'), 'Select speed', Object.keys(gen.speedOptions), key => ({ value: key, label: `${key} — ${gen.speedOptions[key]}` })); updateModuleTypes(); }
+    function updateModuleTypes() { const generation = $('#generation').val(); const formFactor = $('#formFactor').val(); const deviceKey = $('#device').val(); $('#moduleType').html(optionHtml('', 'Select module type')); $('#result').addClass('d-none'); if (!generation) { updateUsagePreview(); return; } const genAllowed = DATA.generations[generation].moduleTypes; let filtered = genAllowed.slice(); if (deviceKey && DATA.devices[deviceKey]) filtered = filtered.filter(typeCode => DATA.devices[deviceKey].preferredTypes.includes(typeCode)); if (formFactor) filtered = filtered.filter(typeCode => { const type = DATA.moduleTypes[typeCode]; return type.allowedFormFactors.includes(formFactor) && DATA.formFactors[formFactor].allowedTypes.includes(typeCode); }); filtered.forEach(typeCode => { const type = DATA.moduleTypes[typeCode]; $('#moduleType').append(optionHtml(typeCode, `${typeCode} — ${type.label}`)); }); updateUsagePreview(); }
+    function buildLabel(speed, moduleType, rank) { let label = speed || ''; if (moduleType) label += moduleType; if (rank) label += ` ${rank}`; return label; }
+    function computeUsage(formFactor, moduleType) { const usageParts = []; if (formFactor && DATA.formFactors[formFactor]) usageParts.push(DATA.formFactors[formFactor].usage); if (moduleType && DATA.moduleTypes[moduleType]) usageParts.push(DATA.moduleTypes[moduleType].usage); return [...new Set(usageParts)].join(' | '); }
+    function updateUsagePreview() { const deviceKey = $('#device').val(); const formFactor = $('#formFactor').val(); const moduleType = $('#moduleType').val(); const parts = []; if (deviceKey && DATA.devices[deviceKey]) parts.push(DATA.devices[deviceKey].label); const usage = computeUsage(formFactor, moduleType); if (usage) parts.push(usage); $('#usagePreview').val(parts.join(' | ')); }
+    function computeCompatibilityBadge(moduleType, formFactor) { if (moduleType === 'E') return '<span class="badge text-bg-success">ECC UDIMM / Entry server-workstation style</span>'; if (moduleType === 'R') return '<span class="badge text-bg-warning">RDIMM / Server-only class</span>'; if (moduleType === 'LR') return '<span class="badge text-bg-warning">LRDIMM / Higher-capacity server class</span>'; if (moduleType === 'FB') return '<span class="badge text-bg-secondary">Legacy FB-DIMM</span>'; if (formFactor === 'SODIMM') return '<span class="badge text-bg-info">SODIMM / Laptop-small form factor</span>'; return '<span class="badge text-bg-primary">General-purpose module class</span>'; }
 
     function getSelection() {
       return {
-        deviceKey: $('#device').val(),
-        generation: $('#generation').val(),
-        voltage: $('#voltage').val(),
-        speed: $('#speed').val(),
-        formFactor: $('#formFactor').val(),
-        moduleType: $('#moduleType').val(),
-        rank: $('#rank').val(),
-        search: ($('#searchInput').val() || '').trim().toLowerCase(),
-        limit: parseInt($('#resultLimit').val(), 10) || 12,
-        mode: $('#suggestionMode').val() || 'strict'
+        deviceKey: $('#device').val(), generation: $('#generation').val(), voltage: $('#voltage').val(), speed: $('#speed').val(), formFactor: $('#formFactor').val(), moduleType: $('#moduleType').val(), rank: $('#rank').val(), capacity: $('#capacityFilter').val(), brandTier: $('#brandTierFilter').val(), search: ($('#searchInput').val() || '').trim().toLowerCase(), limit: parseInt($('#resultLimit').val(), 10) || 12, mode: $('#suggestionMode').val() || 'strict', page: parseInt($('#currentPageDisplay').val(), 10) || 1
       };
     }
 
@@ -410,36 +283,37 @@
       if (selection.formFactor && item.form_factor === selection.formFactor) score += 15;
       if (selection.moduleType && item.type === selection.moduleType) score += 15;
       if (selection.rank && item.rank === selection.rank) score += 10;
+      if (selection.capacity && item.capacity === selection.capacity) score += 10;
+      if (selection.brandTier && item.brand_tier === selection.brandTier) score += 8;
       if (selection.deviceKey && DATA.devices[selection.deviceKey]) {
         const deviceName = DATA.devices[selection.deviceKey].label.toLowerCase();
-        if ((item.device_hint || '').toLowerCase().includes('server') && deviceName.includes('server')) score += 8;
-        if ((item.device_hint || '').toLowerCase().includes('desktop') && deviceName.includes('desktop')) score += 8;
-        if ((item.device_hint || '').toLowerCase().includes('laptop') && deviceName.includes('laptop')) score += 8;
-        if ((item.device_hint || '').toLowerCase().includes('workstation') && deviceName.includes('workstation')) score += 8;
+        const hint = (item.device_hint || '').toLowerCase();
+        if (hint.includes('server') && deviceName.includes('server')) score += 8;
+        if (hint.includes('desktop') && deviceName.includes('desktop')) score += 8;
+        if (hint.includes('laptop') && deviceName.includes('laptop')) score += 8;
+        if (hint.includes('workstation') && deviceName.includes('workstation')) score += 8;
       }
       if (selection.search) {
-        const hay = [item.brand, item.part_number, item.capacity, item.generation, item.speed, item.type, item.form_factor, item.rank, item.device_hint].filter(Boolean).join(' ').toLowerCase();
+        const hay = [item.brand, item.brand_tier, item.part_number, item.capacity, item.generation, item.speed, item.type, item.form_factor, item.rank, item.device_hint].filter(Boolean).join(' ').toLowerCase();
         if (hay.includes(selection.search)) score += 30;
       }
       return score;
     }
 
     function filterSuggestions(selection) {
-      if (!moduleDataset.length) return { matches: [], total: 0, scanned: 0 };
+      if (!moduleDataset.length) return { matches: [], total: 0, scanned: 0, pageMatches: [], totalPages: 0, page: 1, limit: selection.limit };
       const strict = selection.mode === 'strict';
-      const searchOnly = !selection.generation && !selection.speed && !selection.formFactor && !selection.moduleType && !selection.rank && !!selection.search;
       const source = selection.search ? searchIndex : moduleDataset.map((_, idx) => ({ idx }));
       const matches = [];
       let scanned = 0;
-
       for (const ref of source) {
-        const idx = ref.idx !== undefined ? ref.idx : source.indexOf(ref);
+        const idx = ref.idx;
         const item = moduleDataset[idx];
         scanned += 1;
         if (!item) continue;
-
         if (selection.search && ref.search && !ref.search.includes(selection.search)) continue;
-
+        if (selection.capacity && item.capacity !== selection.capacity) continue;
+        if (selection.brandTier && item.brand_tier !== selection.brandTier) continue;
         if (strict) {
           if (selection.generation && item.generation !== selection.generation) continue;
           if (selection.speed && item.speed !== selection.speed) continue;
@@ -448,117 +322,83 @@
           if (selection.rank && item.rank && item.rank !== selection.rank) continue;
         } else {
           const score = scoreItem(item, selection);
-          if (!searchOnly && score <= 0) continue;
+          if (score <= 0) continue;
           item.__score = score;
         }
-
         matches.push(item);
       }
-
       if (!strict) matches.sort((a, b) => (b.__score || 0) - (a.__score || 0));
-      return { matches: matches.slice(0, selection.limit), total: matches.length, scanned };
+      const total = matches.length;
+      const totalPages = Math.max(1, Math.ceil(total / selection.limit));
+      const page = Math.min(Math.max(1, selection.page), totalPages);
+      const start = (page - 1) * selection.limit;
+      const pageMatches = matches.slice(start, start + selection.limit);
+      return { matches, total, scanned, pageMatches, totalPages, page, limit: selection.limit };
+    }
+
+    function renderPagination(result) {
+      const { totalPages, page } = result;
+      const $wrap = $('#paginationWrap');
+      const $pagination = $('#pagination');
+      $pagination.empty();
+      if (totalPages <= 1) { $wrap.addClass('d-none'); $('#currentPageDisplay').val(String(page || 1)); return; }
+      $wrap.removeClass('d-none');
+      $('#currentPageDisplay').val(String(page));
+
+      const addItem = (label, targetPage, disabled = false, active = false) => {
+        const li = $(`<li class="page-item ${disabled ? 'disabled' : ''} ${active ? 'active' : ''}"><a class="page-link">${label}</a></li>`);
+        if (!disabled && !active) li.on('click', () => goToPage(targetPage));
+        $pagination.append(li);
+      };
+
+      addItem('Prev', page - 1, page === 1, false);
+      const start = Math.max(1, page - 2);
+      const end = Math.min(totalPages, page + 2);
+      if (start > 1) addItem('1', 1, false, page === 1);
+      if (start > 2) $pagination.append('<li class="page-item disabled"><span class="page-link">…</span></li>');
+      for (let p = start; p <= end; p++) addItem(String(p), p, false, p === page);
+      if (end < totalPages - 1) $pagination.append('<li class="page-item disabled"><span class="page-link">…</span></li>');
+      if (end < totalPages) addItem(String(totalPages), totalPages, false, page === totalPages);
+      addItem('Next', page + 1, page === totalPages, false);
     }
 
     function renderSuggestions(result) {
-      const matches = result.matches || [];
+      const matches = result.pageMatches || [];
       $('#suggestionsWrap').empty();
-      $('#suggestionStats').text(`Scanned ${result.scanned?.toLocaleString() || 0} record(s) · Found ${result.total?.toLocaleString() || 0} match(es)`);
-      if (!matches.length) {
-        $('#suggestionsEmpty').removeClass('d-none');
-        return;
-      }
+      $('#suggestionStats').text(`Scanned ${result.scanned?.toLocaleString() || 0} record(s) · Found ${result.total?.toLocaleString() || 0} match(es) · Page ${result.page} of ${result.totalPages}`);
+      if (!matches.length) { $('#suggestionsEmpty').removeClass('d-none'); renderPagination(result); return; }
       $('#suggestionsEmpty').addClass('d-none');
       const cards = matches.map(item => {
         const compatibility = [item.generation, item.speed, item.type, item.rank].filter(Boolean).join(' ');
         const scoreLine = item.__score !== undefined ? `<div class="small text-secondary mt-1">Match score: ${item.__score}</div>` : '';
-        return `
-          <div class="col-md-6 col-xl-4">
-            <div class="suggestion-card">
-              <div class="d-flex justify-content-between gap-2 mb-2">
-                <div class="fw-semibold">${item.brand || 'Unknown Brand'}</div>
-                <span class="badge text-bg-light">${item.capacity || 'N/A'}</span>
-              </div>
-              <div class="mono small mb-2">${item.part_number || 'No part number'}</div>
-              <div class="mb-2">${compatibility || 'No decoded label data'}</div>
-              <div class="small text-secondary">${item.form_factor || 'N/A'} · ${item.voltage || 'N/A'} · ${item.device_hint || 'General use'}</div>
-              ${scoreLine}
-            </div>
-          </div>`;
+        return `<div class="col-md-6 col-xl-4"><div class="suggestion-card"><div class="d-flex justify-content-between gap-2 mb-2"><div class="fw-semibold">${item.brand || 'Unknown Brand'}</div><span class="badge text-bg-light">${item.capacity || 'N/A'}</span></div><div class="mono small mb-2">${item.part_number || 'No part number'}</div><div class="mb-2">${compatibility || 'No decoded label data'}</div><div class="small text-secondary">${item.form_factor || 'N/A'} · ${item.voltage || 'N/A'} · ${item.device_hint || 'General use'} · ${item.brand_tier || getBrandTier(item.brand)}</div>${scoreLine}</div></div>`;
       }).join('');
       $('#suggestionsWrap').html(cards);
+      renderPagination(result);
     }
+
+    function runSuggestions(pageOverride = null) {
+      const selection = getSelection();
+      if (pageOverride !== null) selection.page = pageOverride;
+      lastFilterResult = filterSuggestions(selection);
+      renderSuggestions(lastFilterResult);
+      $('#result').removeClass('d-none');
+    }
+    function goToPage(page) { runSuggestions(page); }
 
     function decode() {
       const selection = getSelection();
-      if (!selection.deviceKey || !selection.generation || !selection.speed || !selection.formFactor || !selection.moduleType) {
-        alert('Please select device, generation, speed, form factor, and module type.');
-        return;
-      }
-      const device = DATA.devices[selection.deviceKey];
-      const gen = DATA.generations[selection.generation];
-      const ff = DATA.formFactors[selection.formFactor];
-      const type = DATA.moduleTypes[selection.moduleType];
-      const decodedLabel = buildLabel(selection.speed, selection.moduleType, selection.rank);
-      const resolvedVoltage = selection.voltage || gen.voltageOptions[0];
-      const usage = computeUsage(selection.formFactor, selection.moduleType) || 'Depends on platform';
-
-      $('#decodedLabel').text(decodedLabel);
-      $('#compatBadge').html(computeCompatibilityBadge(selection.moduleType, selection.formFactor));
-      $('#resultDevice').text(device.label);
-      $('#resultDeviceInfo').text(device.info);
-      $('#resultGeneration').text(gen.label);
-      $('#resultGenerationInfo').text(`${gen.years}. ${gen.note}`);
-      $('#resultVoltage').text(resolvedVoltage);
-      $('#resultVoltageInfo').text('Typical operating voltage for the selected generation/module family.');
-      $('#resultSpeed').text(selection.speed);
-      $('#resultSpeedInfo').text(gen.speedOptions[selection.speed] || selection.speed);
-      $('#resultFormFactor').text(selection.formFactor);
-      $('#resultFormFactorInfo').text(ff.info);
-      $('#resultType').text(`${selection.moduleType} — ${type.label}`);
-      $('#resultTypeInfo').text(type.info);
-      $('#resultRank').text(selection.rank || 'Not selected');
-      $('#resultRankInfo').text(selection.rank ? DATA.ranks[selection.rank] : 'Rank is optional. It helps with compatibility, density, and performance clues.');
-      $('#resultFor').text(`${device.label} | ${usage}`);
-      $('#resultForInfo').text('Always verify motherboard, CPU, and BIOS/platform support before buying memory.');
-
-      const summary = [
-        `<li><strong>Device:</strong> ${device.label}</li>`,
-        `<li><strong>Generation:</strong> ${gen.label}</li>`,
-        `<li><strong>Voltage:</strong> ${resolvedVoltage}</li>`,
-        `<li><strong>Speed:</strong> ${gen.speedOptions[selection.speed] || selection.speed}</li>`,
-        `<li><strong>Form factor:</strong> ${selection.formFactor}</li>`,
-        `<li><strong>Module type:</strong> ${type.label}</li>`,
-        `<li><strong>For:</strong> ${device.label} | ${usage}</li>`
-      ];
+      if (!selection.deviceKey || !selection.generation || !selection.speed || !selection.formFactor || !selection.moduleType) { alert('Please select device, generation, speed, form factor, and module type.'); return; }
+      const device = DATA.devices[selection.deviceKey]; const gen = DATA.generations[selection.generation]; const ff = DATA.formFactors[selection.formFactor]; const type = DATA.moduleTypes[selection.moduleType]; const decodedLabel = buildLabel(selection.speed, selection.moduleType, selection.rank); const resolvedVoltage = selection.voltage || gen.voltageOptions[0]; const usage = computeUsage(selection.formFactor, selection.moduleType) || 'Depends on platform';
+      $('#decodedLabel').text(decodedLabel); $('#compatBadge').html(computeCompatibilityBadge(selection.moduleType, selection.formFactor)); $('#resultDevice').text(device.label); $('#resultDeviceInfo').text(device.info); $('#resultGeneration').text(gen.label); $('#resultGenerationInfo').text(`${gen.years}. ${gen.note}`); $('#resultVoltage').text(resolvedVoltage); $('#resultVoltageInfo').text('Typical operating voltage for the selected generation/module family.'); $('#resultSpeed').text(selection.speed); $('#resultSpeedInfo').text(gen.speedOptions[selection.speed] || selection.speed); $('#resultFormFactor').text(selection.formFactor); $('#resultFormFactorInfo').text(ff.info); $('#resultType').text(`${selection.moduleType} — ${type.label}`); $('#resultTypeInfo').text(type.info); $('#resultRank').text(selection.rank || 'Not selected'); $('#resultRankInfo').text(selection.rank ? DATA.ranks[selection.rank] : 'Rank is optional. It helps with compatibility, density, and performance clues.'); $('#resultFor').text(`${device.label} | ${usage}`); $('#resultForInfo').text('Always verify motherboard, CPU, and BIOS/platform support before buying memory.');
+      const summary = [`<li><strong>Device:</strong> ${device.label}</li>`, `<li><strong>Generation:</strong> ${gen.label}</li>`, `<li><strong>Voltage:</strong> ${resolvedVoltage}</li>`, `<li><strong>Speed:</strong> ${gen.speedOptions[selection.speed] || selection.speed}</li>`, `<li><strong>Form factor:</strong> ${selection.formFactor}</li>`, `<li><strong>Module type:</strong> ${type.label}</li>`, `<li><strong>Size filter:</strong> ${selection.capacity || 'All sizes'}</li>`, `<li><strong>Brand tier filter:</strong> ${selection.brandTier || 'All tiers'}</li>`, `<li><strong>For:</strong> ${device.label} | ${usage}</li>`];
       if (selection.rank) summary.push(`<li><strong>Rank:</strong> ${selection.rank}</li>`);
       $('#summaryList').html(summary.join(''));
-
-      renderSuggestions(filterSuggestions(selection));
-      $('#result').removeClass('d-none');
+      runSuggestions(1);
     }
 
-    function searchSuggestionsOnly() {
-      const selection = getSelection();
-      if (!selection.search && !selection.generation && !selection.speed && !selection.formFactor && !selection.moduleType && !selection.rank) {
-        alert('Select filters or enter a search term first.');
-        return;
-      }
-      renderSuggestions(filterSuggestions(selection));
-      $('#result').removeClass('d-none');
-    }
-
-    function resetForm() {
-      $('#device').val('');
-      $('#generation').val('');
-      $('#rank').val('');
-      $('#searchInput').val('');
-      $('#resultLimit').val('12');
-      $('#suggestionMode').val('strict');
-      resetDependentSelects();
-      $('#suggestionsWrap').empty();
-      $('#suggestionsEmpty').addClass('d-none');
-      $('#result').addClass('d-none');
-    }
+    function searchSuggestionsOnly() { const selection = getSelection(); if (!selection.search && !selection.generation && !selection.speed && !selection.formFactor && !selection.moduleType && !selection.rank && !selection.capacity && !selection.brandTier) { alert('Select filters or enter a search term first.'); return; } runSuggestions(1); }
+    function resetForm() { $('#device').val(''); $('#generation').val(''); $('#rank').val(''); $('#capacityFilter').val(''); $('#brandTierFilter').val(''); $('#searchInput').val(''); $('#resultLimit').val('12'); $('#suggestionMode').val('strict'); resetDependentSelects(); $('#suggestionsWrap').empty(); $('#suggestionsEmpty').addClass('d-none'); $('#pagination').empty(); $('#paginationWrap').addClass('d-none'); $('#result').addClass('d-none'); }
 
     $(function () {
       init();
@@ -570,6 +410,7 @@
       $('#searchBtn').on('click', searchSuggestionsOnly);
       $('#resetBtn').on('click', resetForm);
       $('#searchInput').on('keydown', function(e) { if (e.key === 'Enter') searchSuggestionsOnly(); });
+      $('#resultLimit, #suggestionMode, #capacityFilter, #brandTierFilter').on('change', function() { if (!$('#result').hasClass('d-none')) runSuggestions(1); });
     });
   </script>
 </body>
